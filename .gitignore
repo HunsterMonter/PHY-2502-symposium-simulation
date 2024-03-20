@@ -33,6 +33,4 @@
 
 simulation
 tests/testUtils
-gtest.a
-gtest_main.a
 *.swp
