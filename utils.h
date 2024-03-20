@@ -3,4 +3,4 @@
 
 
 std::array <long double, 3>
-rotationEuler (std::array <long double, 3>, long double Omega, long double, i, long double omega);
+rotationEuler (std::array <long double, 3> vecteur, long double Omega, long double i, long double omega);
