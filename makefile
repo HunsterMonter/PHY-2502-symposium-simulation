@@ -1,4 +1,4 @@
-CXXFLAGS = -Ofast -fno-signed-zeros -fno-trapping-math -flto -funroll-loops -Wall -Wextra -pedantic -std=c++23 -march=native -I inc
+CXXFLAGS = -Ofast -fno-signed-zeros -fno-trapping-math -funroll-loops -Wconversion -Wall -Wextra -pedantic -std=c++23 -march=native -I inc
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 
 FILES = utils Planete
@@ -22,7 +22,7 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
 
 $(TARGET): $(OBJECTS) src/$(TARGET).cpp
-	g++ $(CXXFLAGS) $^ -o $(TARGET)
+	g++ -flto $(CXXFLAGS) $^ -o $(TARGET)
 
 all: $(TARGET) $(TESTS)
 

@@ -1,4 +1,5 @@
 #include <cmath>
+#include <numbers>
 #include "../inc/utils.h"
 
 
@@ -19,4 +20,11 @@ rotationEuler (const std::array <long double, 3>& vecteur, long double Omega, lo
 	long double z = si*sw*I + si*cw*J + ci*K;
 
 	return std::array <long double, 3> {x, y, z};
+}
+
+
+long double
+eccentricAnomaly (long double meanAnomaly)
+{
+
 }
