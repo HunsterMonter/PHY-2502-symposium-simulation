@@ -7,9 +7,9 @@
 #include <ranges>
 
 
-const long double r3s2 {std::sqrt (static_cast <long double> (3))/2};
-const long double r2s2 {std::sqrt (static_cast <long double> (2))/2};
-const long double pi {std::numbers::pi_v <long double>};
+constexpr long double r3s2 {std::numbers::sqrt3_v <long double>/2};
+constexpr long double r2s2 {std::numbers::sqrt2_v <long double>/2};
+constexpr long double pi {std::numbers::pi_v <long double>};
 
 
 TEST (TestEuler, RotationNulle)
