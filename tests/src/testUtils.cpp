@@ -1,7 +1,9 @@
 #include "../../inc/utils.h"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <numeric>
 #include <ranges>
 
 
@@ -15,6 +17,7 @@ TEST (TestEuler, RotationNulle)
 	std::array <long double, 3> vec {3, 7.1, -5};
 	EXPECT_EQ (rotationEuler (vec, 0, 0, 0), vec);
 }
+
 
 TEST (TestEuler, Omega30)
 {
@@ -44,6 +47,7 @@ TEST (TestEuler, Omega30)
 	}
 }
 
+
 TEST (TestEuler, I30)
 {
 	std::array <long double, 3> I {1, 0, 0};
@@ -71,6 +75,7 @@ TEST (TestEuler, I30)
 		EXPECT_LT (std::abs (i-Ei), 1e-19l);
 	}
 }
+
 
 TEST (TestEuler, omega30)
 {
@@ -100,6 +105,7 @@ TEST (TestEuler, omega30)
 	}
 }
 
+
 TEST (TestEuler, Omega45I30omega270)
 {
 	std::array <long double, 3> I {1, 0, 0};
@@ -125,5 +131,62 @@ TEST (TestEuler, Omega45I30omega270)
 	for (auto&& [i, Ei] : std::views::zip (z, zE))
 	{
 		EXPECT_LT (std::abs (i-Ei), 2e-19l);
+	}
+}
+
+
+TEST (TestAnomalieExcentrique, Excentricy)
+{
+	std::array <long double, 10> e_vec;
+	std::ranges::generate (e_vec, [n=0, size=e_vec.size ()]() mutable {return static_cast <long double> (n++)/(size-1);});
+
+	long double epsillon {1e-9};
+	long double E {pi/3};
+	long double E_calc;
+	long double M;
+
+	for (auto&& e : e_vec | std::views::as_const)
+	{
+		M = E - e * std::sin (E);
+		E_calc = eccentricAnomaly (M, e, epsillon);
+		EXPECT_LT (std::abs (E-E_calc), epsillon);
+	}
+}
+
+
+TEST (TestAnomalieExcentrique, EccentricAnomaly)
+{
+	std::array <long double, 10> E_vec;
+	std::ranges::generate (E_vec, [n=0, size=E_vec.size ()]() mutable {return static_cast <long double> (n++)*2*pi/(size);});
+
+	long double epsillon {1e-9};
+	long double e {0.2};
+	long double E_calc;
+	long double M;
+
+	for (auto&& E : E_vec | std::views::as_const)
+	{
+		M = E - e * std::sin (E);
+		E_calc = eccentricAnomaly (M, e, epsillon);
+		EXPECT_LT (std::abs (E-E_calc), epsillon);
+	}
+}
+
+
+TEST (TestAnomalieExcentrique, Precision)
+{
+	std::array <long double, 10> epsillon_vec;
+	std::ranges::generate (epsillon_vec, [n=0, size=epsillon_vec.size ()]() mutable {return std::pow (10, static_cast <long double> (n--)-8);});
+
+	long double E {1e-9};
+	long double E_calc;
+	long double e {0.2};
+	long double M;
+
+	for (auto&& epsillon : epsillon_vec | std::views::as_const)
+	{
+		M = E - e * std::sin (E);
+		E_calc = eccentricAnomaly (M, e, epsillon);
+		EXPECT_LT (std::abs (E-E_calc), epsillon);
 	}
 }

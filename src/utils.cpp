@@ -2,6 +2,8 @@
 #include <numbers>
 #include "../inc/utils.h"
 
+const long double pi {std::numbers::pi_v <long double>};
+
 
 std::array <long double, 3>
 rotationEuler (const std::array <long double, 3>& vecteur, long double Omega, long double i, long double omega)
@@ -24,7 +26,22 @@ rotationEuler (const std::array <long double, 3>& vecteur, long double Omega, lo
 
 
 long double
-eccentricAnomaly (long double meanAnomaly)
+eccentricAnomaly (long double M, long double e, long double epsillon)
 {
+	long double E_prev {pi};
+	long double E_next {0};
 
+	while (true)
+	{
+		E_next = M + e * std::sin (E_prev);
+
+		if (std::abs (E_next-E_prev) < epsillon)
+		{
+			return E_next;
+		}
+		else
+		{
+			E_prev = E_next;
+		}
+	}
 }
