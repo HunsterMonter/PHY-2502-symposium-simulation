@@ -6,6 +6,8 @@
 class Planete
 {
 public:
+	Planete () = default;
+
 	Planete (long double e, long double a, long double i, long double Omega, long double omegaBar, long double L0, long double mass, long double Mass);
 
 	Planete (const std::vector <Planete>& planetes, long double mass);
@@ -23,5 +25,5 @@ public:
 private:
 	std::array <long double, 3> pos;
 	std::array <long double, 3> v;
-	const long double m;
+	long double m;
 };
