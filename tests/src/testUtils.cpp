@@ -1,5 +1,5 @@
-#include "../../inc/utils.h"
 #include "gtest/gtest.h"
+#include "utils.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -137,15 +137,24 @@ TEST (TestEuler, Omega45I30omega270)
 
 TEST (TestAnomalieExcentrique, Excentricy)
 {
+	std::array <long double, 10> E_vec;
+	std::ranges::generate (E_vec, [n=0, size=E_vec.size ()]() mutable {return static_cast <long double> (n++)*2*pi/(size);});
+
 	std::array <long double, 10> e_vec;
 	std::ranges::generate (e_vec, [n=0, size=e_vec.size ()]() mutable {return static_cast <long double> (n++)/(size-1);});
 
+	std::array <long double, 10> epsillon_vec;
+	std::ranges::generate (epsillon_vec, [n=0, size=epsillon_vec.size ()]() mutable {return std::pow (10, static_cast <long double> (n--)-8);});
+
+	/*
 	long double epsillon {1e-9};
 	long double E {pi/3};
+	*/
 	long double E_calc;
 	long double M;
 
-	for (auto&& e : e_vec | std::views::as_const)
+	for (auto&& [E, e, epsillon]
+			: std::views::cartesian_product (E_vec, e_vec, epsillon_vec) | std::views::as_const)
 	{
 		M = E - e * std::sin (E);
 		E_calc = eccentricAnomaly (M, e, epsillon);
@@ -154,6 +163,7 @@ TEST (TestAnomalieExcentrique, Excentricy)
 }
 
 
+/*
 TEST (TestAnomalieExcentrique, EccentricAnomaly)
 {
 	std::array <long double, 10> E_vec;
@@ -190,3 +200,4 @@ TEST (TestAnomalieExcentrique, Precision)
 		EXPECT_LT (std::abs (E-E_calc), epsillon);
 	}
 }
+*/

@@ -6,7 +6,9 @@
 constexpr std::array <long double, 3>
 rotationEuler (const std::array <long double, 3>& vecteur, long double Omega, long double i, long double omega)
 {
-	auto[I, J, K] = vecteur;
+	const long double I = vecteur[0];
+	const long double J = vecteur[1];
+	const long double K = vecteur[2];
 
 	const long double cW {std::cos (Omega)};
 	const long double sW {std::sin (Omega)};
@@ -36,12 +38,9 @@ eccentricAnomaly (long double M, long double e, long double epsillon)
 
 		if (std::abs (E_next-E_prev) < epsillon)
 		{
-			return E_next;
+			return M + e * std::sin (E_next);
 		}
-		else
-		{
-			E_prev = E_next;
-		}
+		E_prev = E_next;
 	}
 }
 

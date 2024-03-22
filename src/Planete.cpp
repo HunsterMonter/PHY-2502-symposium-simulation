@@ -1,7 +1,8 @@
 #include "Planete.h"
 #include "utils.h"
-#include <vector>
 #include <cmath>
+#include <ranges>
+#include <vector>
 
 constexpr long double G {6.67430e-11};
 
@@ -30,3 +31,50 @@ Planete::Planete (long double e, long double a, long double i, long double Omega
 	v = rotationEuler (IJK_dot, Omega, i, omega);
 }
 
+
+Planete::Planete (const std::vector <Planete>& planetes, long double mass)
+: m (mass)
+{
+	std::array <long double, 3> posCOM {0};
+	std::array <long double, 3> vCOM {0};
+
+	for (auto&& planete : planetes | std::views::as_const)
+	{
+		for (const long double m {planete.getM ()}; auto&& [xCOM, vCOM, x, v]
+				: std::views::zip (posCOM, vCOM, planete.getPos () , planete.getV () | std::views::as_const))
+		{
+			xCOM += m * x;
+			vCOM += m * v;
+		}
+	}
+}
+
+
+std::array <long double, 3> Planete::getPos () const
+{
+	return pos;
+}
+
+
+void Planete::setPos (std::array <long double, 3> p)
+{
+	pos = p;
+}
+
+
+std::array <long double, 3> Planete::getV () const
+{
+	return v;
+}
+
+
+void Planete::setV (std::array <long double, 3> p)
+{
+	v = p;
+}
+
+
+long double Planete::getM () const
+{
+	return m;
+}
