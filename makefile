@@ -1,7 +1,7 @@
 CXXFLAGS = -Ofast -fno-signed-zeros -fno-trapping-math -funroll-loops -Wconversion -Wall -Wextra -pedantic -std=c++23 -march=native -I inc
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 
-FILES = utils Planete
+FILES = 
 TEST_FILES = testUtils
 TARGET = simulation
 
