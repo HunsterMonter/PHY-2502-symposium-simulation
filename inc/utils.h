@@ -1,10 +1,12 @@
 #ifndef _UTILS_
 #define _UTILS_
 
+#include "arrayOps.h"
 #include <array>
 #include <cmath>
-#include <concepts>
 #include <ranges>
+#include <sstream>
+#include <string>
 #include <tuple>
 
 constexpr long double G {6.67430e-11};
@@ -15,12 +17,37 @@ constexpr long double r2s2 {root2 / 2};
 constexpr long double r3s2 {root3 / 2};
 
 
+constexpr std::array <long double, 2>
+rotation2D (const std::array <long double, 2>& vecteur, long double theta)
+{
+	auto&& [x, y] = vecteur;
+
+	const long double c {std::cos (theta)};
+	const long double s {std::sin (theta)};
+
+	return std::array <long double, 2> {c*x-s*y, s*x+c*y};
+}
+
+
+constexpr std::array <long double, 3>
+rotation2D (const std::array <long double, 3>& vecteur, long double theta)
+{
+	auto&& [I, J, z] = vecteur;
+	auto&& [x, y] = rotation2D (std::array <long double, 2> {I, J}, theta);
+
+	return std::array <long double, 3> {x, y, z};
+}
+
+
 constexpr std::array <long double, 3>
 rotationEuler (const std::array <long double, 3>& vecteur, long double Omega, long double i, long double omega)
 {
+	auto&& [I, J, K] = vecteur;
+	/*
 	const long double I = vecteur[0];
 	const long double J = vecteur[1];
 	const long double K = vecteur[2];
+	*/
 
 	const long double cW {std::cos (Omega)};
 	const long double sW {std::sin (Omega)};
@@ -44,7 +71,7 @@ eccentricAnomaly (long double M, long double e, long double epsillon)
 	long double E_next {0};
 	const size_t n_max {1000};
 
-	for (size_t i {0}; i < n_max; i++)
+	for (size_t i {0}; i < n_max; ++i)
 	{
 		E_next = M + e * std::sin (E_prev);
 
@@ -78,27 +105,8 @@ reduceRange (long double ang)
 }
 
 
-template <typename T>
-constexpr std::tuple <std::array <long double, 3>, std::array <long double, 3>>
-getPosFromCOM (const T& planetes, long double M)
-{
-	std::array <long double, 3> posFromCOM {0, 0, 0};
-	std::array <long double, 3> vFromCOM {0, 0, 0};
+//template <size_t n, size_t m>
+//void printSim (std::string filename, std::array <std::array <Planete, m>, n> sim, std::array <std::string, m> nomsPlanetes, epsillon)
 
-	for (auto&& planete : planetes | std::views::as_const)
-	{
-		const std::array <long double, 3> pos {planete.pos};
-		const std::array <long double, 3> v {planete.v};
-		const long double m {planete.m};
-
-		for (size_t j = 0; j < 3; j++)
-		{
-			posFromCOM[j] -= m * pos[j] / M;
-			vFromCOM[j] -= m * v[j] / M;
-		}
-	}
-
-	return std::make_tuple (posFromCOM, vFromCOM);
-}
 
 #endif

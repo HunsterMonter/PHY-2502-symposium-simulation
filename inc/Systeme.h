@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 
-template <size_t N>
+template <size_t dim, size_t N>
 class Systeme
 {
 public:
@@ -18,9 +18,9 @@ public:
 
 
 	template <size_t iter>
-	std::array <std::array <Planete, N>, iter+1> simulation (long double epsillon)
+	std::array <std::array <Planete <dim>, N>, iter+1> simulation (long double epsillon)
 	{
-		std::array <std::array <Planete, N>, iter+1> output;
+		std::array <std::array <Planete <dim>, N>, iter+1> output;
 		output[0] = planetes;
 
 		for (size_t i {0}; i < iter; i++)
@@ -45,11 +45,11 @@ private:
 		const std::array <long double, 4> c {w1/2, (w0+w1)/2, (w0+w1)/2, w1/2};
 		const std::array <long double, 4> d {w1, w0, w1, 0};
 
-		std::array <Planete, N> state_old {planetes};
+		std::array <Planete <dim>, N> state_old {planetes};
 
 		for (size_t n {0}; n < n_max; n++)
 		{
-			std::array <Planete, N> state {planetes};
+			std::array <Planete <dim>, N> state {planetes};
 
 			const size_t nbPas {static_cast <size_t> (std::pow (2, n))};
 			const long double deltaT {t / nbPas};
@@ -148,7 +148,7 @@ private:
 	}
 
 
-	std::array <Planete, N> planetes;
+	std::array <Planete <dim>, N> planetes;
 };
 
 #endif
