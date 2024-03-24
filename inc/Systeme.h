@@ -2,14 +2,17 @@
 #define _SYSTEME_
 
 #include "Planete.h"
+#include "arrayOps.h"
 #include "utils.h"
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <ranges>
 #include <stdexcept>
+#include <iostream>
 
 
-template <size_t dim, size_t N>
+template <std::floating_point T, size_t dim, size_t N>
 class Systeme
 {
 public:
@@ -18,9 +21,9 @@ public:
 
 
 	template <size_t iter>
-	std::array <std::array <Planete <dim>, N>, iter+1> simulation (long double epsillon)
+	std::array <std::array <Planete <T, dim>, N>, iter+1> simulation (T epsillon)
 	{
-		std::array <std::array <Planete <dim>, N>, iter+1> output;
+		std::array <std::array <Planete <T, dim>, N>, iter+1> output;
 		output[0] = planetes;
 
 		for (size_t i {0}; i < iter; i++)
@@ -33,26 +36,26 @@ public:
 	}
 
 private:
-	void step (size_t T, long double epsillon)
+	void step (size_t jours, T epsillon)
 	{
-		const long double t {static_cast <long double> (86400 * T)};
+		const T temps {static_cast <T> (86400 * jours)};
 		const size_t n_max {32};
 		bool succes {false};
 
-		const long double w0 {-std::cbrt (2) / (2 - std::cbrt (20))};
-		const long double w1 {1 / (2 - std::cbrt (2))};
+		const T w0 {-std::cbrt (2) / (2 - std::cbrt (20))};
+		const T w1 {1 / (2 - std::cbrt (2))};
 
-		const std::array <long double, 4> c {w1/2, (w0+w1)/2, (w0+w1)/2, w1/2};
-		const std::array <long double, 4> d {w1, w0, w1, 0};
+		const std::array <T, 4> c {w1/2, (w0+w1)/2, (w0+w1)/2, w1/2};
+		const std::array <T, 4> d {w1, w0, w1, 0};
 
-		std::array <Planete <dim>, N> state_old {planetes};
+		std::array <Planete <T, dim>, N> state_old {planetes};
 
 		for (size_t n {0}; n < n_max; n++)
 		{
-			std::array <Planete <dim>, N> state {planetes};
+			std::array <Planete <T, dim>, N> state {planetes};
 
 			const size_t nbPas {static_cast <size_t> (std::pow (2, n))};
-			const long double deltaT {t / nbPas};
+			const T deltaT {temps / nbPas};
 
 			for (size_t pas {0}; pas < nbPas; pas++)
 			{
@@ -61,30 +64,24 @@ private:
 					for (size_t j {0}; j < N; j++)
 					{
 						// Mettre à jour la position
-						for (auto&& [xi, vi] : std::views::zip (state[j].pos, state[j].v))
-						{
-							xi += c[i] * vi * deltaT;
-						}
+						state[j].pos += c[i] * state[j].v * deltaT;
 
 						// Mettre à jour la vitesse
 						// Itère sur les paires de planètes pour diviser en 2 le nombre de calculs à faire
 						for (size_t k {0}; k < j; k++)
 						{
-							const std::array <long double, 3> p1 {state[j].pos};
-							const std::array <long double, 3> p2 {state[k].pos};
-							const long double mj {state[j].m};
-							const long double mk {state[k].m};
+							const std::array <T, dim> F {force (state[j].pos, state[k].pos)};
 
-							// Calcul de la force divisée par les deux masses entre la paire de planètes
-							const std::array <long double, 3> delta {p1[0]-p2[0], p1[1]-p2[1], p1[2]-p2[2]};
-							const long double r3 {std::pow (std::hypot (delta[0], delta[1], delta[2]), 3)};
-							const long double force {-G*delta[0]/(2*r3), -G*delta[1]/(2*r3), -G*delta[2]/(2*r3)};
+							state[j].v += d[i] * state[k].m * F * deltaT;
+							state[k].v += d[i] * state[j].m * F * deltaT;
 
+							/*
 							for (auto&& [vj, vk, F] : std::views::zip (state[j].v, state[k].v, force))
 							{
 								vj += d[i] * mk * F * deltaT;
 								vk -= d[i] * mj * F * deltaT;
 							}
+							*/
 						}
 					}
 				}
@@ -96,11 +93,11 @@ private:
 
 			for (size_t p {0}; p < N; p++)
 			{
-				const std::array <long double, 3> pos_old {state_old.pos};
-				const std::array <long double, 3> pos {state.pos};
+				const std::array <T, 3> pos_old {state_old.pos};
+				const std::array <T, 3> pos {state.pos};
 
-				const std::array <long double, 3> v_old {state_old.v};
-				const std::array <long double, 3> v {state.v};
+				const std::array <T, 3> v_old {state_old.v};
+				const std::array <T, 3> v {state.v};
 
 				for (size_t i {0}; i < 3; i++)
 				{
@@ -115,18 +112,22 @@ private:
 				succes = true;
 			}
 			*/
+			std::cout << "Nombre de pas: " << nbPas << std::endl;
 			size_t truth {0};
 
-			for (auto&& [p, p_old] : std::views::zip (state, state_old) | std::views::as_const)
+			for (auto&& [p, p_old, planete] : std::views::zip (state, state_old, planetes) | std::views::as_const)
 			{
-				for (auto&& [pos, pos_old] : std::views::zip (p.pos, p_old.pos) | std::views::as_const)
+				for (auto&& [deltaPos, deltaPos_old] : std::views::zip (p.pos-planete.pos, p_old.pos-planete.pos) | std::views::as_const)
 				{
-					truth += std::abs (pos - pos_old) / 15 < epsillon;
+					truth += std::abs (deltaPos - deltaPos_old) / 15 < max_err (deltaPos, deltaPos_old, epsillon);
+					//std::cout << std::abs (deltaPos - deltaPos_old) / 15 << " " << max_err (deltaPos, deltaPos_old, epsillon) << "\n";
+					std::cout << deltaPos << " " << deltaPos_old << std::endl;
 				}
 
-				for (auto&& [v, v_old] : std::views::zip (p.v, p_old.v) | std::views::as_const)
+				for (auto&& [deltaV, deltaV_old] : std::views::zip (p.v-planete.v, p_old.v-planete.v) | std::views::as_const)
 				{
-					truth += std::abs (v - v_old) / 15 < epsillon;
+					truth += std::abs (deltaV - deltaV_old) / 15 < max_err (deltaV, deltaV_old, epsillon);
+					//std::cout << std::abs (deltaV - deltaV_old) / 15 << " " << max_err (deltaV, deltaV_old, epsillon) << "\n";
 				}
 			}
 
@@ -148,7 +149,7 @@ private:
 	}
 
 
-	std::array <Planete <dim>, N> planetes;
+	std::array <Planete <T, dim>, N> planetes;
 };
 
 #endif

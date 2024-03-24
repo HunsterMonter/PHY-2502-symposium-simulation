@@ -7,10 +7,17 @@
 #include <ranges>
 
 
+const long double pi {std::numbers::pi_v <long double>};
+const long double root2 {std::numbers::sqrt2_v <long double>};
+const long double root3 {std::numbers::sqrt3_v <long double>};
+const long double r2s2 {root2 / 2};
+const long double r3s2 {root3 / 2};
+
+
 TEST (TestEuler, RotationNulle)
 {
 	std::array <long double, 3> vec {3, 7.1, -5};
-	EXPECT_EQ (rotationEuler (vec, 0, 0, 0), vec);
+	EXPECT_EQ (rotationEuler <long double> (vec, 0, 0, 0), vec);
 }
 
 
@@ -20,9 +27,9 @@ TEST (TestEuler, Omega30)
 	std::array <long double, 3> J {0, 1, 0};
 	std::array <long double, 3> K {0, 0, 1};
 
-	std::array <long double, 3> x {rotationEuler (I, pi*30/180, 0, 0)};
-	std::array <long double, 3> y {rotationEuler (J, pi*30/180, 0, 0)};
-	std::array <long double, 3> z {rotationEuler (K, pi*30/180, 0, 0)};
+	std::array <long double, 3> x {rotationEuler <long double> (I, pi*30/180, 0, 0)};
+	std::array <long double, 3> y {rotationEuler <long double> (J, pi*30/180, 0, 0)};
+	std::array <long double, 3> z {rotationEuler <long double> (K, pi*30/180, 0, 0)};
 
 	std::array <long double, 3> xE {r3s2, 0.5, 0};
 	std::array <long double, 3> yE {-0.5, r3s2, 0};
@@ -49,9 +56,9 @@ TEST (TestEuler, I30)
 	std::array <long double, 3> J {0, 1, 0};
 	std::array <long double, 3> K {0, 0, 1};
 
-	std::array <long double, 3> x {rotationEuler (I, 0, pi*30/180, 0)};
-	std::array <long double, 3> y {rotationEuler (J, 0, pi*30/180, 0)};
-	std::array <long double, 3> z {rotationEuler (K, 0, pi*30/180, 0)};
+	std::array <long double, 3> x {rotationEuler <long double> (I, 0, pi*30/180, 0)};
+	std::array <long double, 3> y {rotationEuler <long double> (J, 0, pi*30/180, 0)};
+	std::array <long double, 3> z {rotationEuler <long double> (K, 0, pi*30/180, 0)};
 
 	std::array <long double, 3> xE {I};
 	std::array <long double, 3> yE {0, r3s2, 0.5};
@@ -78,9 +85,9 @@ TEST (TestEuler, omega30)
 	std::array <long double, 3> J {0, 1, 0};
 	std::array <long double, 3> K {0, 0, 1};
 
-	std::array <long double, 3> x {rotationEuler (I, 0, 0, pi*30/180)};
-	std::array <long double, 3> y {rotationEuler (J, 0, 0, pi*30/180)};
-	std::array <long double, 3> z {rotationEuler (K, 0, 0, pi*30/180)};
+	std::array <long double, 3> x {rotationEuler <long double> (I, 0, 0, pi*30/180)};
+	std::array <long double, 3> y {rotationEuler <long double> (J, 0, 0, pi*30/180)};
+	std::array <long double, 3> z {rotationEuler <long double> (K, 0, 0, pi*30/180)};
 
 	std::array <long double, 3> xE {r3s2, 0.5, 0};
 	std::array <long double, 3> yE {-0.5, r3s2, 0};
@@ -107,9 +114,9 @@ TEST (TestEuler, Omega45I30omega270)
 	std::array <long double, 3> J {0, 1, 0};
 	std::array <long double, 3> K {0, 0, 1};
 
-	std::array <long double, 3> x {rotationEuler (I, pi*45/180, pi*30/180, pi*270/180)};
-	std::array <long double, 3> y {rotationEuler (J, pi*45/180, pi*30/180, pi*270/180)};
-	std::array <long double, 3> z {rotationEuler (K, pi*45/180, pi*30/180, pi*270/180)};
+	std::array <long double, 3> x {rotationEuler <long double> (I, pi*45/180, pi*30/180, pi*270/180)};
+	std::array <long double, 3> y {rotationEuler <long double> (J, pi*45/180, pi*30/180, pi*270/180)};
+	std::array <long double, 3> z {rotationEuler <long double> (K, pi*45/180, pi*30/180, pi*270/180)};
 
 	std::array <long double, 3> xE {r2s2*r3s2, -r2s2*r3s2, -0.5};
 	std::array <long double, 3> yE {r2s2, r2s2, 0};
