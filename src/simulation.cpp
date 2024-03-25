@@ -11,7 +11,7 @@ int main ()
 	Planete <long double, 2> soleil (1.9885e30, {terre});
 
 	Systeme <long double, 2, 2> s {soleil, terre};
-	s.simulation <5> (1e-5);
+	s.simulation <5> (1e-15);
 
 	return 0;
 }

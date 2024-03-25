@@ -42,7 +42,7 @@ private:
 		const size_t n_max {32};
 		bool succes {false};
 
-		const T w0 {-std::cbrt (2) / (2 - std::cbrt (20))};
+		const T w0 {-std::cbrt (2) / (2 - std::cbrt (2))};
 		const T w1 {1 / (2 - std::cbrt (2))};
 
 		const std::array <T, 4> c {w1/2, (w0+w1)/2, (w0+w1)/2, w1/2};
@@ -64,24 +64,19 @@ private:
 					for (size_t j {0}; j < N; j++)
 					{
 						// Mettre à jour la position
+						//std::cout << state[j].pos[0] << " ";
 						state[j].pos += c[i] * state[j].v * deltaT;
+						//std::cout << state[j].pos[0] << std::endl;
 
 						// Mettre à jour la vitesse
 						// Itère sur les paires de planètes pour diviser en 2 le nombre de calculs à faire
 						for (size_t k {0}; k < j; k++)
 						{
 							const std::array <T, dim> F {force (state[j].pos, state[k].pos)};
+							//std::cout << F[0] << " " << F[1] << std::endl;
 
 							state[j].v += d[i] * state[k].m * F * deltaT;
-							state[k].v += d[i] * state[j].m * F * deltaT;
-
-							/*
-							for (auto&& [vj, vk, F] : std::views::zip (state[j].v, state[k].v, force))
-							{
-								vj += d[i] * mk * F * deltaT;
-								vk -= d[i] * mj * F * deltaT;
-							}
-							*/
+							state[k].v -= d[i] * state[j].m * F * deltaT;
 						}
 					}
 				}
@@ -121,7 +116,7 @@ private:
 				{
 					truth += std::abs (deltaPos - deltaPos_old) / 15 < max_err (deltaPos, deltaPos_old, epsillon);
 					//std::cout << std::abs (deltaPos - deltaPos_old) / 15 << " " << max_err (deltaPos, deltaPos_old, epsillon) << "\n";
-					std::cout << deltaPos << " " << deltaPos_old << std::endl;
+					//std::cout << deltaPos << " " << deltaPos_old << std::endl;
 				}
 
 				for (auto&& [deltaV, deltaV_old] : std::views::zip (p.v-planete.v, p_old.v-planete.v) | std::views::as_const)
@@ -131,10 +126,11 @@ private:
 				}
 			}
 
-			if (truth == 6*N)
+			if (truth == 2*dim*N)
 			{
 				planetes = state;
 				succes = true;
+				break;
 			}
 			else
 			{

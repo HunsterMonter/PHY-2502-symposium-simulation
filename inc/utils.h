@@ -133,7 +133,7 @@ std::array <T, 2> force (std::array <T, 2> pos1, const std::array <T, 2>& pos2)
 {
 	// Vecteur r de pos2 à pos1
 	pos1 -= pos2;
-	const T G {6.67430e-11};
+	const T G {6.67430e-20}; // kN*km^2/kg^2
 	const T r3 {std::pow (std::hypot (pos1[0], pos1[1]), 3)};
 
 	return -G * pos1 / (2 * r3);
